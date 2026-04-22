@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Titraloka — Full Dev Workflow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #f8f7f4; color: #1a1a18; padding: 32px 24px; }
+
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 6px; color: #1a1a18; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  /* Phase container */
+  .phase { margin-bottom: 40px; }
+  .phase-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  /* Card row */
+  .row { display: flex; align-items: stretch; gap: 0; }
+  .card {
+    flex: 1;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    position: relative;
+  }
+  .card:hover { opacity: 0.85; transform: translateY(-1px); }
+  .card-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .card-sub { font-size: 12px; opacity: 0.7; }
+
+  /* Arrow between cards */
+  .arrow {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; flex-shrink: 0; color: #bbb; font-size: 16px;
+  }
+
+  /* Colors */
+  .amber  { background: #FFF3DC; color: #7A4A00; }
+  .amber  .card-title { color: #6B3F00; }
+  .amber  .card-sub   { color: #9B6A20; }
+
+  .purple { background: #EEEDFE; color: #3C3489; }
+  .purple .card-title { color: #3C3489; }
+  .purple .card-sub   { color: #6B60BB; }
+
+  .teal   { background: #E1F5EE; color: #085041; }
+  .teal   .card-title { color: #085041; }
+  .teal   .card-sub   { color: #1D7A5A; }
+
+  .gray   { background: #F1EFE8; color: #444441; }
+  .gray   .card-title { color: #444441; }
+  .gray   .card-sub   { color: #5F5E5A; }
+
+  /* Step number badge */
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 11px; font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .amber  .badge { background: #F5C97A; color: #6B3F00; }
+  .purple .badge { background: #AFA9EC; color: #26215C; }
+  .teal   .badge { background: #5DCAA5; color: #04342C; }
+  .gray   .badge { background: #B4B2A9; color: #2C2C2A; }
+
+  /* Divider with label */
+  .phase-arrow {
+    text-align: center; margin: 8px 0 16px;
+    color: #ccc; font-size: 20px;
+  }
+
+  /* Explanation boxes */
+  .explain {
+    border-left: 3px solid #E0DDD5;
+    padding: 12px 16px;
+    margin-top: 12px;
+    border-radius: 0 8px 8px 0;
+    background: #fdfcf9;
+  }
+  .explain p { font-size: 13px; line-height: 1.7; color: #555; }
+  .explain code {
+    font-family: 'Courier New', monospace;
+    background: #EEECEA;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #333;
+  }
+  .explain pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin-top: 10px;
+    font-family: 'Courier New', monospace;
+  }
+  .explain pre .kw  { color: #569cd6; }
+  .explain pre .str { color: #ce9178; }
+  .explain pre .cm  { color: #6a9955; }
+  .explain pre .fn  { color: #dcdcaa; }
+  .explain pre .prop{ color: #9cdcfe; }
+
+  /* Timeline strip */
+  .timeline {
+    display: flex; gap: 12px; margin-top: 32px;
+    background: #fff; border: 1px solid #E8E6E0;
+    border-radius: 12px; padding: 20px;
+  }
+  .tl-item { flex: 1; text-align: center; }
+  .tl-time { font-size: 18px; font-weight: 500; color: #1a1a18; }
+  .tl-label { font-size: 12px; color: #888; margin-top: 4px; }
+  .tl-div { width: 1px; background: #E8E6E0; }
+
+  /* Tooltip hint */
+  .hint { font-size: 11px; color: #bbb; text-align: right; margin-bottom: 16px; }
+
+  @media (max-width: 560px) {
+    .row { flex-direction: column; }
+    .arrow { transform: rotate(90deg); width: auto; height: 24px; }
+    .timeline { flex-direction: column; }
+    .tl-div { width: auto; height: 1px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Titraloka — Full Dev Workflow</h1>
+<p class="subtitle">Dari brief klien masuk sampai website live. Klik kartu untuk detail.</p>
+<p class="hint">↓ klik kartu untuk buka penjelasan</p>
+
+<!-- PHASE 1: PERSIAPAN -->
+<div class="phase">
+  <div class="phase-label">Fase 1 — Persiapan</div>
+  <div class="row">
+    <div class="card amber" onclick="toggle('e1')">
+      <div class="badge">1</div>
+      <div class="card-title">Kirim client brief</div>
+      <div class="card-sub">Form ke klien sebelum mulai</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card amber" onclick="toggle('e2')">
+      <div class="badge">2</div>
+      <div class="card-title">Terima aset</div>
+      <div class="card-sub">Gambar, logo, teks konten</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card amber" onclick="toggle('e3')">
+      <div class="badge">3</div>
+      <div class="card-title">Isi client.config.js</div>
+      <div class="card-sub">Semua konten masuk sini</div>
+    </div>
+  </div>
+
+  <div id="e1" class="explain" style="display:none">
+    <p>Sebelum mulai ngoding, lo kirim form brief ke klien. Tujuannya: dapetin semua info yang lo butuhin <em>sebelum</em> mulai, bukan di tengah jalan. Kalau info belum lengkap, proyek belum mulai.</p>
+    <p style="margin-top:10px">Isi brief yang perlu lo minta:</p>
+    <pre><span class="cm">// Checklist brief klien</span>
+<span class="cm">// Identity</span>
+<span class="prop">nama bisnis</span>        <span class="str">"Toko Baju Siti"</span>
+<span class="prop">tagline</span>            <span class="str">"Baju Muslim Terbaik Tangerang"</span>
+<span class="prop">deskripsi bisnis</span>   max 160 karakter
+
+<span class="cm">// Kontak</span>
+<span class="prop">nomor WhatsApp</span>     format internasional
+<span class="prop">instagram</span>          handle @
+<span class="prop">email</span>              opsional
+<span class="prop">alamat</span>             kalau ada toko fisik
+
+<span class="cm">// Visual</span>
+<span class="prop">logo</span>               PNG transparan, min 400px
+<span class="prop">foto hero</span>          landscape, min 1200x600px
+<span class="prop">foto produk</span>        min 3, rasio sama semua
+<span class="prop">warna brand</span>        hex code atau referensi
+
+<span class="cm">// Konten</span>
+<span class="prop">headline utama</span>     max 8 kata
+<span class="prop">layanan/produk</span>     nama + deskripsi singkat
+<span class="prop">testimoni</span>          min 3, nama + isi</pre>
+  </div>
+
+  <div id="e2" class="explain" style="display:none">
+    <p>Setelah brief diisi klien, lo terima semua asetnya. Standarkan format gambar sebelum masuk ke repo — ukuran besar = build lebih lambat, website lebih berat.</p>
+    <p style="margin-top:10px">Standar aset Titraloka:</p>
+    <pre><span class="cm"># Konversi semua gambar ke WebP</span>
+<span class="cm"># (bisa pakai tools online atau Sharp CLI)</span>
+
+hero.jpg     → hero.webp       <span class="cm">max 1200x600, ~150KB</span>
+logo.png     → logo.webp       <span class="cm">transparan, max 400px</span>
+produk-*.jpg → produk-*.webp   <span class="cm">rasio 1:1, max 600x600</span>
+og-image.jpg → og-image.webp  <span class="cm">1200x630, untuk preview link</span>
+
+<span class="cm"># Taruh semua di:</span>
+public/
+  images/
+    hero.webp
+    logo.webp
+    og-image.webp
+    products/
+      produk-1.webp
+      produk-2.webp</pre>
+  </div>
+
+  <div id="e3" class="explain" style="display:none">
+    <p>Ini inti dari sistem template Titraloka. Semua yang beda antar klien ada di satu file ini — lo ga perlu masuk ke tiap component untuk ganti konten.</p>
+    <pre><span class="cm">// content/client.config.js</span>
+
+<span class="kw">export const</span> <span class="prop">client</span> = {
+  <span class="cm">// Identity</span>
+  <span class="prop">name</span>: <span class="str">"Toko Baju Siti"</span>,
+  <span class="prop">tagline</span>: <span class="str">"Baju Muslim Terbaik di Tangerang"</span>,
+  <span class="prop">description</span>: <span class="str">"Toko baju muslim terpercaya..."</span>,
+  <span class="prop">logo</span>: <span class="str">"/images/logo.webp"</span>,
+  <span class="prop">domain</span>: <span class="str">"https://tokobajusiti.com"</span>,
+
+  <span class="cm">// Kontak</span>
+  <span class="prop">whatsapp</span>: <span class="str">"628123456789"</span>,
+  <span class="prop">instagram</span>: <span class="str">"@tokobajusiti"</span>,
+  <span class="prop">email</span>: <span class="str">"siti@tokobajusiti.com"</span>,
+  <span class="prop">alamat</span>: <span class="str">"Jl. Merdeka No. 12, Tangerang"</span>,
+
+  <span class="cm">// Hero</span>
+  <span class="prop">hero</span>: {
+    <span class="prop">headline</span>: <span class="str">"Tampil Cantik dengan Baju Muslim Pilihan"</span>,
+    <span class="prop">subheadline</span>: <span class="str">"Kualitas premium, harga terjangkau"</span>,
+    <span class="prop">ctaText</span>: <span class="str">"Chat Sekarang"</span>,
+    <span class="prop">ctaLink</span>: <span class="str">"https://wa.me/628123456789"</span>,
+    <span class="prop">image</span>: <span class="str">"/images/hero.webp"</span>,
+  },
+
+  <span class="cm">// Layanan / Produk</span>
+  <span class="prop">services</span>: [
+    {
+      <span class="prop">title</span>: <span class="str">"Gamis Dewasa"</span>,
+      <span class="prop">description</span>: <span class="str">"Berbagai pilihan gamis modern"</span>,
+      <span class="prop">image</span>: <span class="str">"/images/products/gamis.webp"</span>,
+    },
+  ],
+
+  <span class="cm">// Testimonials</span>
+  <span class="prop">testimonials</span>: [
+    {
+      <span class="prop">name</span>: <span class="str">"Ibu Rahma"</span>,
+      <span class="prop">text</span>: <span class="str">"Kualitasnya bagus banget!"</span>,
+      <span class="prop">location</span>: <span class="str">"Jakarta"</span>,
+    },
+  ],
+
+  <span class="cm">// SEO</span>
+  <span class="prop">seo</span>: {
+    <span class="prop">title</span>: <span class="str">"Toko Baju Siti | Baju Muslim Tangerang"</span>,
+    <span class="prop">description</span>: <span class="str">"Toko baju muslim terpercaya..."</span>,
+    <span class="prop">ogImage</span>: <span class="str">"/images/og-image.webp"</span>,
+  },
+
+  <span class="cm">// Brand colors → masuk ke Tailwind</span>
+  <span class="prop">brand</span>: {
+    <span class="prop">primary</span>: <span class="str">"#2D6A4F"</span>,
+    <span class="prop">secondary</span>: <span class="str">"#95D5B2"</span>,
+  },
+}</pre>
+  </div>
+</div>
+
+<div class="phase-arrow">↓</div>
+
+<!-- PHASE 2: DEVELOPMENT -->
+<div class="phase">
+  <div class="phase-label">Fase 2 — Development</div>
+  <div class="row">
+    <div class="card purple" onclick="toggle('e4')">
+      <div class="badge">4</div>
+      <div class="card-title">Clone template</div>
+      <div class="card-sub">Setup repo baru per klien</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card purple" onclick="toggle('e5')">
+      <div class="badge">5</div>
+      <div class="card-title">Kustomisasi template</div>
+      <div class="card-sub">Warna, sections, layout</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card purple" onclick="toggle('e6')">
+      <div class="badge">6</div>
+      <div class="card-title">Preview lokal</div>
+      <div class="card-sub">npm run dev → cek semua</div>
+    </div>
+  </div>
+
+  <div id="e4" class="explain" style="display:none">
+    <p>Jangan fork di GitHub UI — clone manual biar bisa set remote ke repo baru yang bersih, tanpa history yang nyambung ke template.</p>
+    <pre><span class="cm"># 1. Clone template ke folder nama klien</span>
+git clone https://github.com/titraloka/template tokobajusiti
+<span class="kw">cd</span> tokobajusiti
+
+<span class="cm"># 2. Hapus remote lama, ganti ke repo baru klien</span>
+git remote remove origin
+git remote add origin https://github.com/titraloka/tokobajusiti
+
+<span class="cm"># 3. Install dependencies</span>
+npm install
+
+<span class="cm"># 4. Push initial commit ke repo baru</span>
+git push -u origin main</pre>
+    <p style="margin-top:10px">Bikin repo baru di GitHub dulu sebelum step ini. Nama repo: <code>klien-[namabisnis]</code> biar gampang dicari kalau udah banyak.</p>
+  </div>
+
+  <div id="e5" class="explain" style="display:none">
+    <p>Ada 3 hal yang dikustomisasi per klien, urutannya penting:</p>
+    <p style="margin-top:10px"><strong>1. Isi client.config.js</strong> (udah dijelasin di step 3)</p>
+    <p style="margin-top:10px"><strong>2. Warna brand masuk ke Tailwind:</strong></p>
+    <pre><span class="cm">// tailwind.config.js</span>
+<span class="kw">import</span> { <span class="prop">client</span> } <span class="kw">from</span> <span class="str">'./content/client.config.js'</span>
+
+<span class="kw">export default</span> {
+  <span class="prop">content</span>: [<span class="str">'./app/**/*.jsx'</span>, <span class="str">'./components/**/*.jsx'</span>],
+  <span class="prop">theme</span>: {
+    <span class="prop">extend</span>: {
+      <span class="prop">colors</span>: {
+        <span class="prop">primary</span>: client.brand.primary,
+        <span class="prop">secondary</span>: client.brand.secondary,
+      },
+    },
+  },
+}</pre>
+    <p style="margin-top:10px">Setelah ini, semua component yang pakai <code>bg-primary</code> atau <code>text-primary</code> otomatis pakai warna brand klien.</p>
+    <p style="margin-top:10px"><strong>3. Aktifkan/nonaktifkan sections:</strong></p>
+    <pre><span class="cm">// app/page.jsx</span>
+<span class="kw">import</span> Hero <span class="kw">from</span> <span class="str">'@/components/sections/Hero'</span>
+<span class="kw">import</span> Services <span class="kw">from</span> <span class="str">'@/components/sections/Services'</span>
+<span class="kw">import</span> Testimonials <span class="kw">from</span> <span class="str">'@/components/sections/Testimonials'</span>
+<span class="kw">import</span> Contact <span class="kw">from</span> <span class="str">'@/components/sections/Contact'</span>
+
+<span class="cm">// Klien ini ga butuh Gallery — comment aja</span>
+<span class="cm">// import Gallery from '@/components/sections/Gallery'</span>
+
+<span class="kw">export default function</span> <span class="fn">Home</span>() {
+  <span class="kw">return</span> (
+    &lt;main&gt;
+      &lt;Hero /&gt;
+      &lt;Services /&gt;
+      &lt;Testimonials /&gt;
+      &lt;Contact /&gt;
+    &lt;/main&gt;
+  )
+}</pre>
+  </div>
+
+  <div id="e6" class="explain" style="display:none">
+    <p>Sebelum nunjukin ke klien, cek checklist ini di localhost:</p>
+    <pre><span class="cm"># Jalankan dev server</span>
+npm run dev
+<span class="cm"># Buka http://localhost:3000</span>
+
+<span class="cm">Checklist preview:</span>
+✓ Semua teks dari config terbaca dengan benar
+✓ Logo dan gambar tampil, tidak broken
+✓ Warna brand sesuai
+✓ Tombol WA mengarah ke nomor yang benar
+✓ Mobile view (Chrome DevTools → toggle device)
+✓ Tidak ada console error</pre>
+    <p style="margin-top:10px">Kalau semua oke, baru kirim preview ke klien. Bisa deploy dulu ke Vercel dengan subdomain sementara seperti <code>tokobajusiti.vercel.app</code> sebelum domain asli dipasang.</p>
+  </div>
+</div>
+
+<div class="phase-arrow">↓</div>
+
+<!-- PHASE 3: LAUNCH -->
+<div class="phase">
+  <div class="phase-label">Fase 3 — Launch</div>
+  <div class="row">
+    <div class="card teal" onclick="toggle('e7')">
+      <div class="badge">7</div>
+      <div class="card-title">Revisi dari klien</div>
+      <div class="card-sub">Edit config → preview ulang</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card teal" onclick="toggle('e8')">
+      <div class="badge">8</div>
+      <div class="card-title">Push ke GitHub</div>
+      <div class="card-sub">Auto trigger Vercel build</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card teal" onclick="toggle('e9')">
+      <div class="badge">9</div>
+      <div class="card-title">Pointing domain</div>
+      <div class="card-sub">DNS klien → Vercel</div>
+    </div>
+  </div>
+
+  <div id="e7" class="explain" style="display:none">
+    <p>Batasi revisi dari awal — kasih tau klien di awal: "2 kali revisi termasuk di harga, lebih dari itu ada biaya tambahan." Ini bukan soal pelit, tapi soal scope management.</p>
+    <p style="margin-top:10px">Untuk request revisi yang masuk:</p>
+    <pre><span class="cm"># Mayoritas revisi cukup edit client.config.js</span>
+<span class="cm"># Contoh: klien minta ganti headline</span>
+
+<span class="cm">// Sebelum</span>
+<span class="prop">headline</span>: <span class="str">"Tampil Cantik dengan Baju Muslim Pilihan"</span>,
+
+<span class="cm">// Sesudah</span>
+<span class="prop">headline</span>: <span class="str">"Koleksi Baju Muslim Premium untuk Keluarga"</span>,
+
+<span class="cm"># Save → browser auto refresh → cek → push</span></pre>
+    <p style="margin-top:10px">Kalau revisinya minta perubahan layout atau section baru — itu di luar scope, masuk ke paket berbeda.</p>
+  </div>
+
+  <div id="e8" class="explain" style="display:none">
+    <p>Sekali Vercel udah di-connect ke GitHub repo, setiap push otomatis trigger build dan deploy. Lo ga perlu buka dashboard Vercel sama sekali.</p>
+    <pre><span class="cm"># Commit dan push semua perubahan</span>
+git add .
+git commit -m <span class="str">"update: konten final klien tokobajusiti"</span>
+git push
+
+<span class="cm"># Vercel otomatis:</span>
+<span class="cm"># 1. Detect push</span>
+<span class="cm"># 2. Run next build</span>
+<span class="cm"># 3. Deploy ke CDN global</span>
+<span class="cm"># 4. Live dalam ~1-2 menit</span></pre>
+    <p style="margin-top:10px">Lo bisa pantau status build di dashboard Vercel atau dari notifikasi email. Kalau build gagal, Vercel kasih log errornya.</p>
+  </div>
+
+  <div id="e9" class="explain" style="display:none">
+    <p>Domain dibeli di Niagahoster/Dewaweb, tapi DNS-nya diarahkan ke Vercel. Ada dua cara:</p>
+    <pre><span class="cm"># Cara 1: Ganti Nameserver (lebih simpel)</span>
+<span class="cm"># Di Niagahoster, ganti NS ke:</span>
+ns1.vercel-dns.com
+ns2.vercel-dns.com
+
+<span class="cm"># Cara 2: Tambah CNAME record (kalau NS ga bisa diganti)</span>
+<span class="cm"># Di DNS manager Niagahoster, tambah:</span>
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+
+<span class="cm"># Di Vercel dashboard:</span>
+<span class="cm"># Settings → Domains → Add domain → tokobajusiti.com</span>
+<span class="cm"># Vercel kasih instruksi step by step + HTTPS otomatis</span></pre>
+    <p style="margin-top:10px">Propagasi DNS biasanya 15-30 menit, kadang sampai 24 jam. Selama nunggu, website tetap bisa diakses via <code>*.vercel.app</code>.</p>
+  </div>
+</div>
+
+<div class="phase-arrow">↓</div>
+
+<!-- PHASE 4: POST-LAUNCH -->
+<div class="phase">
+  <div class="phase-label">Fase 4 — Post-launch</div>
+  <div class="row">
+    <div class="card gray" onclick="toggle('e10')">
+      <div class="badge">10</div>
+      <div class="card-title">Submit sitemap</div>
+      <div class="card-sub">Google Search Console</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card gray" onclick="toggle('e11')">
+      <div class="badge">11</div>
+      <div class="card-title">Handle update</div>
+      <div class="card-sub">WA → edit → push</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card gray" onclick="toggle('e12')">
+      <div class="badge">12</div>
+      <div class="card-title">Maintenance rutin</div>
+      <div class="card-sub">Domain renewal, deps update</div>
+    </div>
+  </div>
+
+  <div id="e10" class="explain" style="display:none">
+    <p>Setelah domain live, langsung setup Google Search Console untuk klien. Ini yang kasih tau Google "website ini ada, tolong crawl."</p>
+    <pre><span class="cm"># Step-by-step:</span>
+1. Buka search.google.com/search-console
+2. Add property → masukkan domain klien
+3. Verify ownership → pilih metode DNS record
+   (tambah TXT record di Niagahoster)
+4. Setelah verified → Sitemaps
+5. Submit: https://tokobajusiti.com/sitemap.xml
+
+<span class="cm"># sitemap.xml otomatis di-generate next-sitemap</span>
+<span class="cm"># setelah next build (via postbuild script)</span></pre>
+    <p style="margin-top:10px">Google biasanya mulai index dalam 1-7 hari. Ini bisa lo masukin sebagai value-add ke klien — "website lo udah didaftarin ke Google."</p>
+  </div>
+
+  <div id="e11" class="explain" style="display:none">
+    <p>Flow update konten yang efisien — target under 10 menit dari request masuk sampai live:</p>
+    <pre><span class="cm"># Klien WA: "Kak bisa ganti foto produk yang ini?"</span>
+
+1. Klien kirim foto baru via WA/Drive
+2. Lo compress + konversi ke WebP
+3. Replace file di public/images/
+4. git add . && git commit -m "update: foto produk"
+5. git push
+6. Tunggu ~2 menit → live otomatis
+
+<span class="cm"># Untuk ganti teks/info:</span>
+1. Edit client.config.js
+2. git add . && git commit -m "update: info kontak"
+3. git push → live</pre>
+    <p style="margin-top:10px">Ini bisa dijadiin layanan tambahan — "maintenance bulanan" dengan harga flat. Misalnya Rp150-300rb/bulan untuk update konten sampai X kali.</p>
+  </div>
+
+  <div id="e12" class="explain" style="display:none">
+    <p>Hal-hal yang perlu dicek secara berkala:</p>
+    <pre><span class="cm"># Tahunan</span>
+- Renewal domain klien (ingatkan 1 bulan sebelum expired)
+- Cek Google Search Console — ada error crawl?
+
+<span class="cm"># Per 3 bulan</span>
+- Update dependencies Next.js
+  npm update
+  npm audit fix
+
+<span class="cm"># Kalau ada masalah</span>
+- Website down? Cek Vercel dashboard (status build)
+- Domain ga bisa diakses? Cek DNS di Niagahoster
+- Build error? Lihat log di Vercel → biasanya
+  dependency conflict atau breaking change</pre>
+    <p style="margin-top:10px">Renewal domain bisa lo jadiin reminder otomatis di Google Calendar — set 45 hari sebelum expired untuk semua klien. Kalau lo yang pegang domain klien, ini jadi recurring revenue juga.</p>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline">
+  <div class="tl-item">
+    <div class="tl-time">30 mnt</div>
+    <div class="tl-label">Brief → Config</div>
+  </div>
+  <div class="tl-div"></div>
+  <div class="tl-item">
+    <div class="tl-time">1–2 jam</div>
+    <div class="tl-label">Dev & kustomisasi</div>
+  </div>
+  <div class="tl-div"></div>
+  <div class="tl-item">
+    <div class="tl-time">30 mnt</div>
+    <div class="tl-label">Revisi & push</div>
+  </div>
+  <div class="tl-div"></div>
+  <div class="tl-item">
+    <div class="tl-time">15 mnt</div>
+    <div class="tl-label">Domain & Search Console</div>
+  </div>
+  <div class="tl-div"></div>
+  <div class="tl-item">
+    <div class="tl-time">~3–4 jam</div>
+    <div class="tl-label">Total (konten lengkap)</div>
+  </div>
+</div>
+
+<script>
+function toggle(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.style.display !== 'none';
+  // Close all
+  document.querySelectorAll('.explain').forEach(e => e.style.display = 'none');
+  // Open clicked if it was closed
+  if (!isOpen) el.style.display = 'block';
+}
+</script>
+</body>
+</html>
